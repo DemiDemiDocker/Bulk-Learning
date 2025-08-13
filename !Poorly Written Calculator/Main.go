@@ -11,9 +11,10 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
+// Main GUI Formatting
 func main() {
 	application := app.New()
-	window := application.NewWindow("Poorly Written Calculator")
+	window := application.NewWindow("PWC")
 	window.Resize(fyne.NewSize(360, 260))
 
 	firstEntry := widget.NewEntry()
@@ -32,10 +33,11 @@ func main() {
 		a, err1 := strconv.ParseFloat(firstEntry.Text, 64)
 		b, err2 := strconv.ParseFloat(secondEntry.Text, 64)
 		if err1 != nil || err2 != nil {
-			resultLabel.SetText("Result: numbers only")
+			resultLabel.SetText("Result: Bro it's a calculator")
 			return
 		}
 
+		//Caculator Component
 		var result float64
 		switch opSelect.Selected {
 		case "+":
@@ -56,10 +58,12 @@ func main() {
 		}
 
 		resultLabel.SetText(fmt.Sprintf("Result: %g", result))
+
 	}
 
 	calcButton := widget.NewButton("Calculate", calculate)
 
+	//More UI
 	content := container.NewVBox(
 		widget.NewLabel("Poorly Written Calculator"),
 		firstEntry,
@@ -70,6 +74,7 @@ func main() {
 	)
 	window.SetContent(content)
 
+	//Tool Bar Logic and Options
 	var toolsMenu *fyne.Menu
 	var aboutMenu *fyne.Menu
 	var toggleItem *fyne.MenuItem
@@ -96,7 +101,7 @@ func main() {
 		toggleItem,
 	)
 
-	aboutMenu = fyne.NewMenu("Made by Demi")
+	aboutMenu = fyne.NewMenu("Demi")
 
 	window.SetMainMenu(fyne.NewMainMenu(toolsMenu, aboutMenu))
 	window.ShowAndRun()
