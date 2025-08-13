@@ -1,18 +1,10 @@
+
+Goals
 Code backend in Golang
 API call with React 
 Electron front end with type script
 
-Add Defyne (Fyne UI designer)
-- Install the Defyne tool:
-  - Windows PowerShell:
-    - Ensure a C compiler is available for CGO (e.g., install MSYS2 and `mingw-w64-x86_64-gcc`).
-    - Install Defyne binary:
-      `go install github.com/fyne-io/defyne@latest`
-- Track Defyne in go.mod (already set up via `tools/tools.go`). Run:
-  `go mod tidy`
-- Launch Defyne:
-  - From terminal in the project root: `defyne`
-  - Or from the app menu: Tools → Open Defyne
 
-Notes
-- If `defyne` is not recognized, ensure `GOPATH/bin` is in your PATH. On Windows that is typically `C:\Users\<you>\go\bin`.
+
+Add Defyne (Fyne UI designer)
+
