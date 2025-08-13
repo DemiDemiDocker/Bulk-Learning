@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os/exec"
-	"runtime"
 	"strconv"
 
 	"fyne.io/fyne/v2"
@@ -12,10 +10,11 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
+// Main application GUI function
 func main() {
 	application := app.New()
 	window := application.NewWindow("Poorly Written Calculator")
-	window.Resize(fyne.NewSize(460, 320))
+	window.Resize(fyne.NewSize(360, 260))
 
 	firstEntry := widget.NewEntry()
 	firstEntry.SetPlaceHolder("First number")
@@ -29,14 +28,15 @@ func main() {
 
 	resultLabel := widget.NewLabel("Result: —")
 
+	//Error handling
 	calculate := func() {
 		a, err1 := strconv.ParseFloat(firstEntry.Text, 64)
 		b, err2 := strconv.ParseFloat(secondEntry.Text, 64)
 		if err1 != nil || err2 != nil {
-			resultLabel.SetText("Result: invalid input")
+			resultLabel.SetText("Result: Bruh, numbers only")
 			return
 		}
-
+		//Calculator Functionality
 		var result float64
 		switch opSelect.Selected {
 		case "+":
@@ -57,7 +57,29 @@ func main() {
 		}
 
 		resultLabel.SetText(fmt.Sprintf("Result: %g", result))
+		}
 	}
+	// Calculator Functionality
+	var result float64
+	switch opSelect.Selected {
+	case "+":
+		result = a + b
+	case "-":
+		result = a - b
+	case "×":
+		result = a * b
+	case "÷":
+		if b == 0 {
+			resultLabel.SetText("Result: division by zero")
+			return
+		}
+		result = a / b
+	default:
+		resultLabel.SetText("Result: choose operation")
+		return
+	}
+
+	resultLabel.SetText(fmt.Sprintf("Result: %g", result))
 
 	calcButton := widget.NewButton("Calculate", calculate)
 
@@ -67,28 +89,9 @@ func main() {
 		secondEntry,
 		opSelect,
 		calcButton,
-		resultLabel,
-	)
+		resultLabel)
 
-	// Tools > Open Defyne
-	openDefyne := func() {
-		cmdName := "defyne"
-		if runtime.GOOS == "windows" {
-			cmdName = "defyne.exe"
-		}
-		cmd := exec.Command(cmdName)
-		if err := cmd.Start(); err != nil {
-			dialog := widget.NewLabel("Defyne not found. Install: go install github.com/fyne-io/defyne@latest")
-			window.SetContent(container.NewVBox(content, dialog))
-			return
-		}
-	}
-
-	toolsMenu := fyne.NewMenu("Tools",
-		fyne.NewMenuItem("Open Defyne", func() { openDefyne() }),
-	)
-	window.SetMainMenu(fyne.NewMainMenu(toolsMenu))
-
-	window.SetContent(content)
-	window.ShowAndRun()
+	//Defyne menu options, will add more later on
+	toolsMenu := fyne.NewMenu("Options"),
+		fyne.NewMenuItem("Light Mode", nil)
 }
