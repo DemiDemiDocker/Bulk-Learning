@@ -41,7 +41,9 @@ func main() {
 	)
 
 	// UI switch between metrics; only one form visible at a time
-	opSelect := widget.NewSelect(operations, func(value string) {
+	opSelect := widget.NewSelect(operations, func(string) {})
+	opSelect.PlaceHolder = "Select..."
+	opSelect.OnChanged = func(value string) {
 		switch strings.ToLower(value) {
 		case "imperial":
 			if metricForm != nil {
@@ -58,17 +60,11 @@ func main() {
 				metricForm.Show()
 			}
 		}
-	})
+	}
 
 	// Default selection detection (case-insensitive) and initial visibility
-	opSelect.Selected = "Imperial"
-	if strings.ToLower(opSelect.Selected) == "imperial" {
-		metricForm.Hide()
-		imperialForm.Show()
-	} else {
-		imperialForm.Hide()
-		metricForm.Show()
-	}
+	imperialForm.Hide()
+	metricForm.Hide()
 
 	// Build content after forms/select are ready
 	content := container.NewVBox(
