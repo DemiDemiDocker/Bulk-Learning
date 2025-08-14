@@ -1,27 +1,2 @@
-
-Calculator 
-Separating logic from UI
-Better UI + Standard UI
-Infinitly growing file in code
-
-Json - think about time periods for data removal
-Database 
-Held in RAM - Avoid 
-
-
-Create a BMI Calculator
-Formula based calculation based on user import
-Provide option to switch between imperial or metric
-
-Convert your height from centimeters to meters 
-(e.g., 170 cm = 1.7 m). 
-Square your height in meters 
-(1.7 m × 1.7 m = 2.89 m²). 
-Divide your weight in kilograms by the squared height in meters 
-(e.g., 70 kg ÷ 2.89 m² = 24.2 BMI)
-
-
-Goals
-Code backend in Golang
-API call with React 
-Electron front end with type script
+Defyne/Fyne UI
+Darkmode and Lightmode 
