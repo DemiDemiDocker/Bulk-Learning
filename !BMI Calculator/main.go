@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strconv"
 	"strings"
 
 	"fyne.io/fyne/v2"
@@ -40,27 +41,81 @@ func main() {
 		metricHeight,
 	)
 
+	// Add a label to display the result
+	resultLabel := widget.NewLabel("")
+
 	// UI switch between metrics; only one form visible at a time
-	opSelect := widget.NewSelect(operations, func(string) {})
-	opSelect.PlaceHolder = "Select..."
-	opSelect.OnChanged = func(value string) {
+	opSelect := widget.NewSelect(operations, func(value string) {
+		// Hide both forms initially
+		if metricForm != nil {
+			metricForm.Hide()
+		}
+		if imperialForm != nil {
+			imperialForm.Hide()
+		}
+
 		switch strings.ToLower(value) {
 		case "imperial":
-			if metricForm != nil {
-				metricForm.Hide()
-			}
 			if imperialForm != nil {
 				imperialForm.Show()
 			}
-		case "metric":
-			if imperialForm != nil {
-				imperialForm.Hide()
+			// Try to parse values and calculate BMI
+			weight, errW := strconv.ParseFloat(imperialWeight.Text, 64)
+			height, errH := strconv.ParseFloat(imperialHeight.Text, 64)
+			if errW == nil && errH == nil && height > 0 {
+				bmi := (weight / (height * height)) * 703
+				resultLabel.SetText("BMI: " + strconv.FormatFloat(bmi, 'f', 2, 64))
+			} else {
+				resultLabel.SetText("")
 			}
+		case "metric":
 			if metricForm != nil {
 				metricForm.Show()
 			}
+			// Try to parse values and calculate BMI
+			weight, errW := strconv.ParseFloat(metricWeight.Text, 64)
+			height, errH := strconv.ParseFloat(metricHeight.Text, 64)
+			if errW == nil && errH == nil && height > 0 {
+				bmi := weight / ((height / 100) * (height / 100))
+				resultLabel.SetText("BMI: " + strconv.FormatFloat(bmi, 'f', 2, 64))
+			} else {
+				resultLabel.SetText("")
+			}
 		}
-	}
+	})
+	opSelect.PlaceHolder = "Select..."
+
+	// Create calculate button
+	calculateButton := widget.NewButton("Calculate BMI", func() {
+		// Get current selection to determine which form is active
+		currentSelection := opSelect.Selected
+		switch strings.ToLower(currentSelection) {
+		case "imperial":
+			weight, errW := strconv.ParseFloat(imperialWeight.Text, 64)
+			height, errH := strconv.ParseFloat(imperialHeight.Text, 64)
+			if errW == nil && errH == nil && height > 0 {
+				bmi := (weight / (height * height)) * 703
+				resultLabel.SetText("BMI: " + strconv.FormatFloat(bmi, 'f', 2, 64))
+			} else {
+				resultLabel.SetText("Please enter valid weight and height values")
+			}
+		case "metric":
+			weight, errW := strconv.ParseFloat(metricWeight.Text, 64)
+			height, errH := strconv.ParseFloat(metricHeight.Text, 64)
+			if errW == nil && errH == nil && height > 0 {
+				bmi := weight / ((height / 100) * (height / 100))
+				resultLabel.SetText("BMI: " + strconv.FormatFloat(bmi, 'f', 2, 64))
+			} else {
+				resultLabel.SetText("Please enter valid weight and height values")
+			}
+		default:
+			resultLabel.SetText("Please select a measurement system first")
+		}
+	})
+
+	// Add calculate button to both forms
+	imperialForm.Add(calculateButton)
+	metricForm.Add(calculateButton)
 
 	// Default selection detection (case-insensitive) and initial visibility
 	imperialForm.Hide()
@@ -72,6 +127,7 @@ func main() {
 		opSelect,
 		imperialForm,
 		metricForm,
+		resultLabel,
 	)
 	window.SetContent(content)
 
