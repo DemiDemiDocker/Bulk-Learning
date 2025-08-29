@@ -1,2 +1,3 @@
-Need to add gender selection option
-As well as Age input
+Added Age input and formated GUI
+Limit + error handling for age input
+Change gender to drop down rather then input

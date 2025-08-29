@@ -21,8 +21,18 @@ func main() {
 	operations := []string{"Imperial", "Metric"}
 	var imperialForm *fyne.Container
 	var metricForm *fyne.Container
+	var ageForm *fyne.Container
+	var genderForm *fyne.Container
 
-	// Build input forms first
+	//Build input forms first
+	genderEntry := widget.NewEntry()
+	genderEntry.SetPlaceHolder("Please enter your gender")
+	genderForm = container.NewVBox(genderEntry)
+
+	ageEntry := widget.NewEntry()
+	ageEntry.SetPlaceHolder("Please enter your age")
+	ageForm = container.NewVBox(ageEntry)
+
 	imperialWeight := widget.NewEntry()
 	imperialWeight.SetPlaceHolder("Weight (lbs)")
 	imperialHeight := widget.NewEntry()
@@ -41,12 +51,12 @@ func main() {
 		metricHeight,
 	)
 
-	// Add a label to display the result
 	resultLabel := widget.NewLabel("")
 
-	// UI switch between metrics; only one form visible at a time
+	//UI Switching for metric options
 	opSelect := widget.NewSelect(operations, func(value string) {
-		// Hide both forms initially
+
+		//Hide both forms initially
 		if metricForm != nil {
 			metricForm.Hide()
 		}
@@ -59,7 +69,8 @@ func main() {
 			if imperialForm != nil {
 				imperialForm.Show()
 			}
-			// Try to parse values and calculate BMI
+
+			//This needs work, incorrect formula
 			weight, errW := strconv.ParseFloat(imperialWeight.Text, 64)
 			height, errH := strconv.ParseFloat(imperialHeight.Text, 64)
 			if errW == nil && errH == nil && height > 0 {
@@ -72,7 +83,8 @@ func main() {
 			if metricForm != nil {
 				metricForm.Show()
 			}
-			// Try to parse values and calculate BMI
+
+			//This needs work, incorrect formula
 			weight, errW := strconv.ParseFloat(metricWeight.Text, 64)
 			height, errH := strconv.ParseFloat(metricHeight.Text, 64)
 			if errW == nil && errH == nil && height > 0 {
@@ -85,9 +97,9 @@ func main() {
 	})
 	opSelect.PlaceHolder = "Select..."
 
-	// Create calculate button
+	//Create calculate button
 	calculateButton := widget.NewButton("Calculate BMI", func() {
-		// Get current selection to determine which form is active
+		//This needs work, incorrect formula
 		currentSelection := opSelect.Selected
 		switch strings.ToLower(currentSelection) {
 		case "imperial":
@@ -113,22 +125,27 @@ func main() {
 		}
 	})
 
-	// Add calculate button to both forms
+	//Add calculate button to both forms
 	imperialForm.Add(calculateButton)
 	metricForm.Add(calculateButton)
 
-	// Default selection detection (case-insensitive) and initial visibility
+	//Default selection detection (case-insensitive) and initial visibility
 	imperialForm.Hide()
 	metricForm.Hide()
 
-	// Build content after forms/select are ready
+	//Build content after forms/select are ready
 	content := container.NewVBox(
+		widget.NewLabel("Gender Selection"),
+		genderForm,
+		widget.NewLabel("Age"),
+		ageForm,
 		widget.NewLabel("Measurement System"),
 		opSelect,
 		imperialForm,
 		metricForm,
 		resultLabel,
 	)
+
 	window.SetContent(content)
 
 	//Tool Bar Logic and Options
