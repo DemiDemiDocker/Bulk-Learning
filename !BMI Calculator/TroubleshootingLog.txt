@@ -1,0 +1,136 @@
+BMI Calculator Troubleshooting Log
+====================================
+Date: September 3, 2025
+Issue: OpenGL build constraints excluding Go files on Windows
+Goal: Fix CGO compilation issues without modifying main.go
+
+INITIAL PROBLEM IDENTIFICATION
+==============================
+The BMI Calculator was failing to build with this error:
+"github.com/go-gl/gl/v2.1/gl: build constraints exclude all Go files"
+
+Root cause: OpenGL packages require CGO enabled and a C compiler on Windows.
+
+STEP 1: INSTALLING MSYS2 AND C COMPILER
+========================================
+1. Checked if MSYS2 was already installed:
+   - Found MSYS2 at C:\msys64
+
+2. Added MSYS2 paths to PowerShell PATH:
+   $env:PATH += ";C:\msys64\usr\bin;C:\msys64\mingw64\bin"
+
+3. Verified pacman was accessible:
+   pacman --version
+   - Success: Pacman v6.1.0 - libalpm v14.0.0
+
+4. Updated MSYS2 package database:
+   pacman -Syu --noconfirm
+   - Result: All packages up to date
+
+5. Installed Git:
+   pacman -S --noconfirm git
+   - Result: Git 2.51.0-1-x86_64 installed successfully
+
+6. Installed MinGW-w64 toolchain (includes GCC):
+   pacman -S --noconfirm mingw-w64-x86_64-toolchain
+   - Result: GCC 15.2.0-8 installed successfully
+   - Includes: binutils, gcc, gdb, make, and development libraries
+
+7. Verified GCC installation:
+   gcc --version
+   - Result: gcc.exe (Rev8, Built by MSYS2 project) 15.2.0
+
+STEP 2: CONFIGURING CGO ENVIRONMENT
+====================================
+1. Enabled CGO:
+   $env:CGO_ENABLED="1"
+
+2. Set C compiler:
+   $env:CC="gcc"
+
+3. Set C++ compiler:
+   $env:CXX="g++"
+
+4. Added MinGW-w64 paths to PATH:
+   $env:PATH += ";C:\msys64\mingw64\bin;C:\msys64\usr\bin"
+
+5. Set PKG_CONFIG_PATH:
+   $env:PKG_CONFIG_PATH = "C:\msys64\mingw64\lib\pkgconfig"
+
+6. Verified environment variables:
+   echo "CGO_ENABLED: $env:CGO_ENABLED"
+   echo "CC: $env:CC"
+   echo "CXX: $env:CXX"
+   echo "PKG_CONFIG_PATH: $env:PKG_CONFIG_PATH"
+   
+   Results:
+   - CGO_ENABLED: 1
+   - CC: gcc
+   - CXX: g++
+   - PKG_CONFIG_PATH: C:\msys64\mingw64\lib\pkgconfig
+
+STEP 3: ANALYZING OPENGL PACKAGE ISSUES
+========================================
+1. Investigated the problematic OpenGL package:
+   - Location: C:\Users\Demi\go\pkg\mod\github.com\go-gl\gl@v0.0.0-20231021071112-07e5d0ea2e71\v2.1\gl
+   - Found build constraints in build_cgo_hack.go
+   - Package requires CGO and C compiler
+
+2. Checked package.go for build constraints:
+   - Found CGO directives for Windows OpenGL linking
+   - Package expects Windows OpenGL libraries (lopengl32)
+
+STEP 4: ATTEMPTING PACKAGE REPLACEMENT
+=======================================
+1. Added replace directive in go.mod:
+   replace github.com/go-gl/gl => github.com/go-gl/gl v0.0.0-20211210172815-726fda9656d6
+
+2. Downloaded new dependencies:
+   go mod tidy
+   - Result: Downloaded older OpenGL version
+
+3. Attempted build with new package:
+   go build -o bmi-calculator.exe .
+   - Issue: Still looking for v2.1/gl structure
+
+STEP 5: UPDATING FYNE VERSION
+==============================
+1. Updated Fyne to v2.7.0 in go.mod:
+   - Changed from v2.6.3 to v2.7.0
+   - Hoping for better Windows OpenGL compatibility
+
+CURRENT STATUS
+==============
+- MSYS2 and GCC are properly installed
+- CGO environment is correctly configured
+- OpenGL package compatibility issues persist
+- Package structure mismatch between versions
+
+NEXT STEPS TO TRY
+=================
+1. Test build with updated Fyne version
+2. Try building with specific build tags (glfw, windows)
+3. Consider downgrading to a more stable Fyne version
+4. Investigate alternative OpenGL package versions
+
+ENVIRONMENT VARIABLES TO SET FOR FUTURE SESSIONS
+===============================================
+$env:CGO_ENABLED="1"
+$env:CC="gcc"
+$env:CXX="g++"
+$env:PATH += ";C:\msys64\mingw64\bin;C:\msys64\usr\bin"
+$env:PKG_CONFIG_PATH = "C:\msys64\mingw64\lib\pkgconfig"
+
+COMMANDS TO RUN FOR TESTING
+==========================
+1. go mod tidy (after any go.mod changes)
+2. go build -v -o bmi-calculator.exe . (verbose build)
+3. go run .\main.go (direct run test)
+
+NOTES
+=====
+- The issue is not with the Go code but with OpenGL package compatibility
+- CGO must be enabled for Fyne GUI applications on Windows
+- MSYS2 provides the necessary C compiler and libraries
+- Package version mismatches can cause build constraint issues
+

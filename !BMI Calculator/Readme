@@ -1,3 +1,6 @@
 Added Age input and formated GUI
 Limit + error handling for age input
 Change gender to drop down rather then input
+OpenGL DLL problem with Defyne and Fyne import
+Need to look at packaging this into a single applications or exe to easier use.
+
