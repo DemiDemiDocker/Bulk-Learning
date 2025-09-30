@@ -2,6 +2,9 @@
 - Golang
 - Fyne/Defyne UI
 - React API
+- CSS
+- JSON
+- Java Script
 ---
 ## Current Goals
 
